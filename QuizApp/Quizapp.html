@@ -1,0 +1,148 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const quizContainer = document.getElementById('quiz');
+    const resultsContainer = document.getElementById('results');
+    const submitButton = document.getElementById('submit');
+    const retryButton = document.getElementById('retry');
+    const timerElement = document.getElementById('timer');
+    
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let timer;
+    
+    const questions = [
+        {
+            question: "What is the capital of France?",
+            answers: {
+                a: "London",
+                b: "Paris",
+                c: "Berlin",
+                d: "Madrid"
+            },
+            correctAnswer: "b"
+        },
+        {
+            question: "Which planet is known as the Red Planet?",
+            answers: {
+                a: "Venus",
+                b: "Mars",
+                c: "Jupiter",
+                d: "Saturn"
+            },
+            correctAnswer: "b"
+        },
+        {
+            question: "What is the largest mammal?",
+            answers: {
+                a: "Elephant",
+                b: "Blue Whale",
+                c: "Giraffe",
+                d: "Polar Bear"
+            },
+            correctAnswer: "b"
+        },
+        {
+            question: "Which language runs in a web browser?",
+            answers: {
+                a: "Java",
+                b: "C",
+                c: "Python",
+                d: "JavaScript"
+            },
+            correctAnswer: "d"
+        },
+        {
+            question: "What year was JavaScript launched?",
+            answers: {
+                a: "1996",
+                b: "1995",
+                c: "1994",
+                d: "None of the above"
+            },
+            correctAnswer: "b"
+        }
+    ];
+    
+    function startTimer() {
+        timer = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = `Time remaining: ${timeLeft} seconds`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                showResults();
+            }
+        }, 1000);
+    }
+    
+    function buildQuiz() {
+        startTimer();
+        showQuestion();
+    }
+    
+    function showQuestion() {
+        const question = questions[currentQuestion];
+        
+        const answers = [];
+        for (const letter in question.answers) {
+            answers.push(
+                `<label>
+                    <input type="radio" name="question${currentQuestion}" value="${letter}">
+                    ${letter}: ${question.answers[letter]}
+                </label>`
+            );
+        }
+        
+        quizContainer.innerHTML = `
+            <div class="question">${currentQuestion + 1}. ${question.question}</div>
+            <div class="answers">${answers.join('')}</div>
+        `;
+    }
+    
+    function showResults() {
+        clearInterval(timer);
+        
+        // Check answers
+        const answerContainers = quizContainer.querySelectorAll('.answers label');
+        let numCorrect = 0;
+        
+        questions.forEach((question, questionNumber) => {
+            const answerContainer = answerContainers[questionNumber];
+            const selector = `input[name=question${questionNumber}]:checked`;
+            const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+            
+            if (userAnswer === question.correctAnswer) {
+                numCorrect++;
+                answerContainer.classList.add('correct');
+            } else {
+                answerContainer.classList.add('incorrect');
+            }
+        });
+        
+        score = Math.round((numCorrect / questions.length) * 100);
+        
+        resultsContainer.innerHTML = `
+            You scored ${numCorrect} out of ${questions.length} (${score}%)!
+        `;
+        
+        submitButton.classList.add('hide');
+        retryButton.classList.remove('hide');
+    }
+    
+    function retryQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        timeLeft = 60;
+        resultsContainer.innerHTML = '';
+        submitButton.classList.remove('hide');
+        retryButton.classList.add('hide');
+        timerElement.textContent = `Time remaining: ${timeLeft} seconds`;
+        buildQuiz();
+    }
+    
+    submitButton.addEventListener('click', showResults);
+    retryButton.addEventListener('click', retryQuiz);
+    
+    // Start the quiz
+    buildQuiz();
+});
