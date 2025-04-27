@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        button {
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Quiz</h1>
+    <div id="quiz"></div>
+    <button id="submit">Submit Answers</button>
+    <div id="result"></div>
+
+    <script>
+        // Quiz questions
+        const questions = [
+            {
+                question: "What is 2 + 2?",
+                options: ["3", "4", "5", "6"],
+                answer: 1
+            },
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                answer: 2
+            },
+            {
+                question: "Which language runs in a browser?",
+                options: ["Java", "C", "Python", "JavaScript"],
+                answer: 3
+            }
+        ];
+
+        // Display quiz
+        const quizElement = document.getElementById('quiz');
+        questions.forEach((q, i) => {
+            quizElement.innerHTML += `
+                <div class="question">${i+1}. ${q.question}</div>
+                <div class="options">
+                    ${q.options.map((opt, j) => `
+                        <label>
+                            <input type="radio" name="q${i}" value="${j}">
+                            ${opt}
+                        </label><br>
+                    `).join('')}
+                </div>
+            `;
+        });
+
+        // Check answers
+        document.getElementById('submit').addEventListener('click', () => {
+            let score = 0;
+            questions.forEach((q, i) => {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && parseInt(selected.value) === q.answer) {
+                    score++;
+                }
+            });
+            document.getElementById('result').innerHTML = 
+                `You scored ${score} out of ${questions.length}!`;
+        });
+    </script>
+</body>
+</html>
